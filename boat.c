@@ -2,19 +2,11 @@
 #include "LoRa_E220.h"
 LoRa_E220 e220ttl(16, 17, &Serial2, 15, 21, 19, UART_BPS_RATE_9600); //  esp32 RX <-- e220 TX, esp32 TX --> e220 RX AUX M0 M1
 
-// motor 1 RPWM 33
-// motor 1 LPWM 32
-
-// motor 2 RPWM 26
-// motor 2 LPWM 27
-
-
 int RPWM_Output_Left = 32;
 int LPWM_Output_Left = 33; 
 
 int RPWM_Output_Right = 26;
 int LPWM_Output_Right = 27; 
-// 32;33 ,27;26
 
 int RPWM_Output_Mid = 14;
 int LPWM_Output_Mid = 12; 
@@ -32,16 +24,19 @@ void setup() {
   
   Serial.begin(9600);
   delay(500);
+
   pinMode(RPWM_Output_Left, OUTPUT);
   pinMode(LPWM_Output_Left, OUTPUT);
-  //right engine
+
   pinMode(RPWM_Output_Right, OUTPUT);
   pinMode(LPWM_Output_Right, OUTPUT);
-  
+
   pinMode(RPWM_Output_Mid,OUTPUT);
   pinMode(LPWM_Output_Mid,OUTPUT);
+  
   pinMode(RPWM_Output_Mid_Fb,OUTPUT);
   pinMode(LPWM_Output_Mid_Fb,OUTPUT);
+
   e220ttl.begin();
 
   Serial.println("Start receiving!");
@@ -84,7 +79,7 @@ int git(int olan, int istenilen)
 void loop() {
   if (e220ttl.available()>1) {
       Serial.println("Message received!");
-        // read the String message
+      // read the String message
       ResponseStructContainer rc = e220ttl.receiveMessage(sizeof(Signal));
       // Is something goes wrong print error
       if (rc.status.code!=1){
@@ -95,24 +90,7 @@ void loop() {
         Serial.println(rc.status.getResponseDescription());
         Serial.println("gelen veri - ");
         struct Signal data = *(Signal *) rc.data;
-        /*
-        Serial.print("left _ right power = ");
-        Serial.println(data.left_right_power + 3);  // en son char ve mid power kontrolü yapacaktım 
 
-        Serial.print("up _ down power = ");
-        Serial.println(data.up_down_power + 3);
-
-        Serial.print("ana hiz = ");
-        Serial.println(data.hiz + 3);
-
-        // ucuncu motor alanı
-        Serial.print("ucuncu motor = ");
-        Serial.println(data.mid_power + 3);
-
-        Serial.print("ucuncu motor on of= ");
-        Serial.println(data.on_off[4]);
-        // read data
-        */
       if(1)
       {
         wanted.left_right_power_now = 0;
@@ -137,8 +115,7 @@ void loop() {
         }
         ucuncu_motor_yon = data.on_off[4];      
       }
-   // Serial.print("wanteDDD_hiz_now");
-   // Serial.println(wanted.hiz_now);
+
     
     int updown_yon;
     if(wanted.up_down_power_now > 9)
@@ -212,29 +189,18 @@ void loop() {
     {
       glob_mid_hiz = git(glob_mid_hiz,wanted.mid_power_now);
     }
-    //Serial.print("glob_mid_hiz");
-    //Serial.println(glob_mid_hiz);
-
     if(glob_mid_yon == 'i')
     {
-      //Serial.println("durum i");
       int PWM = glob_mid_hiz  * 10;
       analogWrite(LPWM_Output_Left, PWM);
       analogWrite(RPWM_Output_Left, 0);
     }
     else if(glob_mid_yon == 'g')
     {
-      //Serial.println("durum g");
       int PWM = glob_mid_hiz  * 10;
       analogWrite(LPWM_Output_Left, 0);
       analogWrite(RPWM_Output_Left, PWM);        
-    }
-      //Serial.print("glob_hiz = ");
-      //Serial.println(glob_hiz);
-      //Serial.print("wanted.up_down_power_now = ");
-      //Serial.println(wanted.up_down_power_now);
-      //Serial.print("left_right_power_now = ");
-      //Serial.println(wanted.left_right_power_now);     
+    }    
        
   // state 1 => only sol    sol motor geri çalışıyor sağ motor ileri çalışıyor
   
@@ -255,8 +221,6 @@ void loop() {
      * 
      * state 1 -> state 2 ------> sol ve sağ motoru sıfırla her ikisininde yönünü değiştir.
      * state 1 -> state 3 ------> sol motoru sıfırla yönü değiştir
-     * 
-     * 
      */ 
      
       if(wanted.up_down_power_now == 9  && wanted.left_right_power_now  == 9)
