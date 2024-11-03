@@ -1,6 +1,6 @@
 # Controlled-Sea-Vehicle
 
-<img src="https://github.com/bilalorhanlr/Controlled-Sea-Vehicle/blob/main/910.png">
+<img src="https://github.com/bilalorhanlr/Controlled-Sea-Vehicle/blob/main/910.jpg">
 
 We are using LoRaWAN to establish communication between the remote control and the sea vehicle. On the remote control, we have used 2 switches, 1 screen, 1 receiver for the image that is displayed on the screen, 1 switch, and 1 potentiometer for the 3rd motor used to clean the debris. As stated in the "controller.c" file, we have defined the necessary functions and communication protocols for the remote control to send and receive messages from the sea vehicle.
 
